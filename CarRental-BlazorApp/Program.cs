@@ -1,3 +1,4 @@
+using Blazored.SessionStorage;
 using CarRental_BlazorApp.Data;
 using DataAccessLibrary;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +15,7 @@ builder.Services.AddTransient<ICarData, CarData>();
 builder.Services.AddTransient<IClientData, ClientData>();
 builder.Services.AddTransient<ICarTypeData, CarTypeData>();
 builder.Services.AddTransient<IRentalData, RentalData>();
+builder.Services.AddBlazoredSessionStorage();
 
 var app = builder.Build();
 

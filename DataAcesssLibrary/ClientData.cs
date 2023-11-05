@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace DataAccessLibrary
 {
@@ -33,7 +34,7 @@ namespace DataAccessLibrary
         }
         public async Task<bool> CheckCredentials(string email, string password)
         {
-            string sql = "SELECT COUNT(*) FROM dbo.Clients WHERE Email = @Email AND Password = @Password";
+            string sql = "SELECT * FROM dbo.Clients WHERE Email = @Email AND Password = @Password";
 
             var parameters = new { Email = email, Password = password };
 
@@ -41,6 +42,17 @@ namespace DataAccessLibrary
 
             return matchingClients.Count > 0;
         }
+        public async Task<int> GetClientIdByEmail(string email)
+        {
+            string sql = "SELECT Client_id FROM dbo.Clients WHERE Email = @Email";
+
+            var parameters = new { Email = email };
+
+            var results = await _db.LoadData<int, dynamic>(sql, parameters);
+
+            return results.First();
+        }
+    }
     }
 
-}
+        

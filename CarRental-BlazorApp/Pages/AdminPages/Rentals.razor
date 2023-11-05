@@ -4,9 +4,11 @@
 @using DataAccessLibrary.Models
 @using CarRental_BlazorApp.Models
 
+@inject Blazored.SessionStorage.ISessionStorageService session
 @inject IRentalData _db_Rentals
 @inject IClientData _db_Clients
 @inject ICarData _db_Cars
+@inject NavigationManager Navigation
 
 
 <h3>Rentals</h3>
@@ -62,6 +64,10 @@
 
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
+
+<button type="submit" class="btn btn-primary" @onclick="ClearSession">Exit</button>
+
+
 
 @if (rentals is null)
 {
@@ -119,24 +125,33 @@ else
         newRental.StartDate = DateTime.Now;
         newRental.EndDate = DateTime.Now;
     }
+    public ClientModel client;
 
     private async Task InsertRental()
     {
+        client = await session.GetItemAsync<ClientModel>("SessionUser");
+
         RentalModel rental = new RentalModel
-            {
-                StartDate = newRental.StartDate.Date,
-                EndDate = newRental.EndDate.Date,
-                CarRegistration = newRental.CarRegistration,
-                PickUpDate = DateTime.MinValue,
-                ReturnDate = DateTime.MinValue,
-                Status = 'A',
-                Client_ID = newRental.Client_ID
-            };
+                {
+                    StartDate = newRental.StartDate.Date,
+                    EndDate = newRental.EndDate.Date,
+                    CarRegistration = newRental.CarRegistration,
+                    PickUpDate = DateTime.MinValue,
+                    ReturnDate = DateTime.MinValue,
+                    Status = 'A',
+                    Client_ID = newRental.Client_ID
+                };
         await _db_Rentals.InsertRental(rental);
 
         rentals = await _db_Rentals.GetRentals();
 
         newRental = new DisplayRentalModel();
+    }
+    public void ClearSession()
+    {
+        session.ClearAsync();
+        client = new ClientModel();
+        Navigation.NavigateTo("/login");
     }
 }
 }
