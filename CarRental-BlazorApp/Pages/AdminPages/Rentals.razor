@@ -8,11 +8,12 @@
 @inject IRentalData _db_Rentals
 @inject IClientData _db_Clients
 @inject ICarData _db_Cars
+@inject ICarTypeData _db_Car_Types
 @inject NavigationManager Navigation
 
 
 <h3>Rentals</h3>
-<h4>Create a Rental:</h4>
+<h6>Please enter the details of your rental below and select a car type and fuel type to find a car to rent!:</h6>
 
 
 <EditForm Model="@newRental" OnValidSubmit="@InsertRental">
@@ -42,82 +43,102 @@
         }
     </InputSelect>
 
-    <label for="Car_Registration">Car Registration: </label>
-    <InputSelect id="Car_Registration" @bind-Value="newRental.CarRegistration" class="m-1">
-        @if (cars is null)
+    <label for="Car_Type">Car Type: </label>
+    <InputSelect id="Car_Type" @bind-Value="selectedCarType" class="m-1">
+        @if (carTypes is null)
         {
             <option value="-1">-1</option>
         }
         else
         {
 
-        <option value="">Select</option>
+            <option value="">Select</option>
 
-            @foreach (var car in cars)
+            @foreach (var carType in carTypes)
             {
-                <option value="@car.Registration">@car.Registration</option>
+                <option value="@carType.CarType">@carType.CarType</option>
             }
         }
     </InputSelect>
-
+    <label for="fuelType">Fuel Type: </label>
+    <InputSelect id="fuelType" @bind-Value="selectedFuelType" class="m-1">
+        <option value="">Select</option>
+        <option value="Diesel">Diesel</option>
+        <option value="Petrol">Petrol</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="Electric">Electric</option>
+    </InputSelect>
     
-
-    <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
 
-<button type="submit" class="btn btn-primary" @onclick="ClearSession">Exit</button>
-
-
-
-@if (rentals is null)
+@if (cars is null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
+    <h3>Available Cars</h3>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Rental_ID</th>
-                <th>StartDate</th>
-                <th>EndDate</th>
-                <th>PickUpDate</th>
-                <th>ReturnDate</th>
-                <th>Status</th>
-                <th>CarRegistration</th>
-                <th>Client_ID</th>
+                <th>Registration</th>
+                <th>Fuel Type</th>
+                <th>Car Type</th>
+                
                 
             </tr>
         </thead>
         <tbody>
-            @foreach (var rental in rentals)
+            @foreach (var car in cars)
             {
+                if (car.CarType.Equals(selectedCarType) && car.FuelType.Equals(selectedFuelType))
+                {
                 <tr>
-                    <td>@rental.Rental_ID</td>
-                    <td>@rental.StartDate</td>
-                    <td>@rental.EndDate</td>
-                    <td>@rental.PickUpDate</td>
-                    <td>@rental.ReturnDate</td>
-                    <td>@rental.Status.ToString()</td>
-                    <td>@rental.CarRegistration</td>
-                    <td>@rental.Client_ID</td>
+                    <td>@car.Registration</td>
+                    <td>@car.FuelType</td>
+                    <td>@car.CarType</td>
+                    <td><button @onclick="@(()=> setRegistration(@car.Registration))" value="@car.Registration" type="submit" class="btn btn-primary">Select</button></td>
                 </tr>
+                }
             }
 
         </tbody>
     </table>
+
+    @if (selectedRegistration.Length == 0)
+    {
+        <p>You have not selected a Registration</p>
+    }
+    else
+
+    {
+        <p>the registration you have selected is @selectedRegistration</p>
+    }
+ 
+
+    <button type="submit" class="btn btn-primary" @onclick="ClearSession">Exit</button>
+
+    <button type="submit" class="btn btn-primary" @onclick="InsertRental">Confirm Rental</button>
+
+
+
+
     @code {
     private List<RentalModel> rentals;
     private List<ClientModel> clients;
     private List<CarModel> cars;
+    private List<CarTypeModel> carTypes;
     private DisplayRentalModel newRental = new DisplayRentalModel();
+    String selectedCarType = "";
+    String selectedFuelType = "";
+    String selectedRegistration = "";
 
     protected override async Task OnInitializedAsync()
     {
         rentals = await _db_Rentals.GetRentals();
         clients = await _db_Clients.GetClients();
         cars = await _db_Cars.GetCars();
-
+        carTypes = await _db_Car_Types.GetCarTypes();
     }
 
     protected override void OnInitialized()
@@ -135,7 +156,7 @@ else
                 {
                     StartDate = newRental.StartDate.Date,
                     EndDate = newRental.EndDate.Date,
-                    CarRegistration = newRental.CarRegistration,
+                    CarRegistration = selectedRegistration,
                     PickUpDate = DateTime.MinValue,
                     ReturnDate = DateTime.MinValue,
                     Status = 'A',
@@ -146,12 +167,19 @@ else
         rentals = await _db_Rentals.GetRentals();
 
         newRental = new DisplayRentalModel();
+
+        ClearSession();
     }
     public void ClearSession()
     {
         session.ClearAsync();
         client = new ClientModel();
         Navigation.NavigateTo("/login");
+    }
+
+    public void setRegistration(String reg)
+    {
+        selectedRegistration = reg;
     }
 }
 }
