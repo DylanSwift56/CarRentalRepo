@@ -1,4 +1,4 @@
-﻿@page "/admin/rentals"
+﻿@page "/rent"
 
 @using DataAccessLibrary
 @using DataAccessLibrary.Models
@@ -12,7 +12,7 @@
 @inject NavigationManager Navigation
 
 
-<h3>Rentals</h3>
+<h3>Rental A Car</h3>
 <h6>Please enter the details of your rental below and select a car type and fuel type to find a car to rent!:</h6>
 
 
@@ -84,8 +84,7 @@ else
                 <th>Registration</th>
                 <th>Fuel Type</th>
                 <th>Car Type</th>
-                
-                
+                <th>Cost Per Day</th>
             </tr>
         </thead>
         <tbody>
@@ -97,6 +96,7 @@ else
                     <td>@car.Registration</td>
                     <td>@car.FuelType</td>
                     <td>@car.CarType</td>
+                    <td>@car.CostPerDay</td>
                     <td><button @onclick="@(()=> setRegistration(@car.Registration))" value="@car.Registration" type="submit" class="btn btn-primary">Select</button></td>
                 </tr>
                 }

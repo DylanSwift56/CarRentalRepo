@@ -1,0 +1,337 @@
+﻿@page "/admin/dashboard"
+
+@using DataAccessLibrary
+@using DataAccessLibrary.Models
+@using CarRental_BlazorApp.Models
+
+@inject ICarData _db_cars
+@inject ICarTypeData _db_carsTypes
+@inject IClientData _db_Clients
+@inject IRentalData _db_Rentals
+
+
+<h1>Admin Dashboard</h1>
+
+
+<div class="row">
+    <div class="col-8">
+        <h4>Insert New Car:</h4>
+        <EditForm Model="@newCar" OnValidSubmit="@InsertCar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputText id="registration" @bind-Value="newCar.Registration" placeholder="Registration" class="m-1" />
+            <label for="fuelType">Fuel Type?</label>
+            <InputSelect id="fuelType" @bind-Value="newCar.FuelType" class="m-1">
+                <option value="">Select</option>
+                <option vlaue="Diesel">Diesel</option>
+                <option vlaue="Petrol">Petrol</option>
+                <option vlaue="Hybrid">Hybrid</option>
+                <option vlaue="Electric">Electric</option>
+            </InputSelect>
+            <InputText id="model" @bind-Value="newCar.Model" placeholder="Car Model" class="m-1" />
+            <br />
+            <label for="numberOfPassengers">Number Of Passengers?</label>
+            <InputNumber id="numberOfPassengers" @bind-Value="newCar.NumberOfPassengers" ParsingErrorMessage="Number of passengers must be an integer value" class="m-1" />
+            <label for="costPerDay">Cost Per Day?</label>
+            <InputNumber id="costPerDay" @bind-Value="newCar.CostPerDay" ParsingErrorMessage="Cost Per Day must be a float value" class="m-1" />
+            <br />
+            <label for="carType">Car Type?</label>
+            <InputSelect id="carType" @bind-Value="newCar.CarType">
+                @if (carTypes != null)
+                {
+                    <option value="">Select...</option>
+                    @foreach (var item in carTypes)
+                    {
+                        <option value="@item.CarType">@item.CarType</option>
+                    }
+                }
+            </InputSelect>
+
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+        <h4> Cars On Data Base: </h4>
+        @if (cars is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Regirstration</th>
+                        <th>Fuel Type</th>
+                        <th>Cost Per Day</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in cars)
+                    {
+                        <tr>
+                            <td>@car.Registration</td>
+                            <td>@car.FuelType</td>
+                            <td>@car.CostPerDay</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-8">
+        <h4>Insert New Client:</h4>
+        <EditForm Model="@newClient" OnValidSubmit="@InsertClient">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputText id="name" @bind-Value="newClient.Name" placeholder="Name" class="m-1" />
+            <InputDate id="dob" @bind-Value="newClient.DOB" placeholder="Date of Birth"></InputDate>
+            <InputText id="phone" @bind-Value="newClient.Phone" placeholder="Phone" class="m-1" />
+            <br />
+            <InputText id="email" @bind-Value="newClient.Email" placeholder="Email Address" class="m-1" />
+            <InputText id="password" @bind-Value="newClient.Password" placeholder="Password" class="m-1" />
+            <br />
+            <label for="licenceType">Type of drivers Licence?</label>
+            <InputSelect id="licenceType" @bind-Value="newClient.LicenceType" placeholder="Licence Type" class="m-1">
+                <option value="">Select</option>
+                <option vlaue="Learner" >Learner</option>
+                <option vlaue="Full-Irish"> Full-Irish</option>
+            </InputSelect>
+            <label for="company">Are you traveling for business?</label>
+            <InputSelect id="company" @bind-Value="newClient.Company" class="m-1">
+                <option value="" >Select</option>
+                <option vlaue="No" >No</option>
+                <option vlaue="Yes" > Yes</option>
+            </InputSelect>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+
+        <h4> Clients On Data Base: </h4>
+
+
+        @if (clients is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Client_ID</th>
+                        <th>Name</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>LicenceType</th>
+                        <th>Company</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var client in clients)
+                    {
+                        <tr>
+                            <td>@client.Client_id</td>
+                            <td>@client.Name</td>
+                            <td>@client.DOB</td>
+                            <td>@client.Phone</td>
+                            <td>@client.Email</td>
+                            <td>@client.Password</td>
+                            <td>@client.LicenceType</td>
+                            <td>@client.Company</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-8">
+        <h3>Rentals</h3>
+        <h4>Create a Rental:</h4>
+
+        <EditForm Model="@newRental" OnValidSubmit="@InsertRental">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <label for="StartDate">Start Date: </label>
+            <InputDate id="StartDate" @bind-Value="newRental.StartDate" min=@DateTime.Now.Date></InputDate>
+
+            <label for="EndDate">End Date: </label>
+            <InputDate id="EndDate" @bind-Value="newRental.EndDate" min=@DateTime.Now.Date></InputDate>
+            <br />
+            <label for="Client_ID">Client ID: </label>
+            <InputSelect id="Client_ID" @bind-Value="newRental.Client_ID" class="m-1">
+                @if(clients is null)
+                {
+                    <option value="-1">-1</option>
+                }else{
+
+                @foreach (var client in clients)
+                {
+
+                    <option value="">Select</option>
+
+                    <option value="@client.Client_id">@client.Client_id</option>
+                }
+                }
+            </InputSelect>
+
+            <label for="Car_Registration">Car Registration: </label>
+            <InputSelect id="Car_Registration" @bind-Value="newRental.CarRegistration" class="m-1">
+                @if (cars is null)
+                {
+                    <option value="-1">-1</option>
+                }
+                else
+                {
+
+                <option value="">Select</option>
+
+                    @foreach (var car in cars)
+                    {
+                        <option value="@car.Registration">@car.Registration</option>
+                    }
+                }
+            </InputSelect>
+
+
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+
+        @if (rentals is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Rental_ID</th>
+                        <th>StartDate</th>
+                        <th>EndDate</th>
+                        <th>PickUpDate</th>
+                        <th>ReturnDate</th>
+                        <th>CarRegistration</th>
+                        <th>Client_ID</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rental in rentals)
+                    {
+                        <tr>
+                            <td>@rental.Rental_ID</td>
+                            <td>@rental.StartDate</td>
+                            <td>@rental.EndDate</td>
+                            <td>@rental.PickUpDate</td>
+                            <td>@rental.ReturnDate</td>
+                            <td>@rental.CarRegistration</td>
+                            <td>@rental.Client_ID</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            }
+}
+    </div>
+</div>
+
+
+
+@code {
+    private List<CarModel> cars;
+    private List<CarTypeModel> carTypes;
+    private DisplayCarModel newCar = new DisplayCarModel();
+
+    private List<RentalModel> rentals;
+    private DisplayRentalModel newRental = new DisplayRentalModel();
+
+    private List<ClientModel> clients;
+    private DisplayClientModel newClient = new DisplayClientModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        cars = await _db_cars.GetCars();
+        clients = await _db_Clients.GetClients();
+        carTypes = await _db_carsTypes.GetCarTypes();
+        rentals = await _db_Rentals.GetRentals();
+    }
+
+
+    private async Task InsertCar()
+    {
+        CarModel car = new CarModel
+            {
+                Registration = newCar.Registration,
+                FuelType = newCar.FuelType,
+                Model = newCar.Model,
+                NumberOfPassengers = newCar.NumberOfPassengers,
+                CostPerDay = newCar.CostPerDay,
+                CarType = newCar.CarType
+            };
+        await _db_cars.InsertCar(car);
+
+        cars = await _db_cars.GetCars();
+
+        newCar = new DisplayCarModel();
+    }
+
+    protected override void OnInitialized()
+    {
+        newClient.DOB = DateTime.Now;
+        newRental.StartDate = DateTime.Now;
+        newRental.EndDate = DateTime.Now;
+    }
+
+    private async Task InsertClient()
+    {
+        ClientModel client = new ClientModel
+            {
+                Name = newClient.Name,
+                Phone = newClient.Phone,
+                DOB = newClient.DOB,
+                Email = newClient.Email,
+                Password = newClient.Password,
+                LicenceType = newClient.LicenceType,
+                Company = newClient.Company
+            };
+        await _db_Clients.InsertClient(client);
+
+        clients = await _db_Clients.GetClients();
+
+        newClient = new DisplayClientModel();
+    }
+
+    private async Task InsertRental()
+    {
+        RentalModel rental = new RentalModel
+            {
+                StartDate = newRental.StartDate,
+                EndDate = newRental.EndDate.Date,
+                CarRegistration = newRental.CarRegistration,
+                PickUpDate = DateTime.MinValue,
+                ReturnDate = DateTime.MinValue,
+                Client_ID = newRental.Client_ID
+            };
+        await _db_Rentals.InsertRental(rental);
+
+        rentals = await _db_Rentals.GetRentals();
+
+        newRental = new DisplayRentalModel();
+    }
+}
+
