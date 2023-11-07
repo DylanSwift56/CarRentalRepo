@@ -160,7 +160,7 @@ else
                     PickUpDate = DateTime.MinValue,
                     ReturnDate = DateTime.MinValue,
                     Status = 'A',
-                    Client_ID = newRental.Client_ID
+                    Client_ID = client.Client_id
                 };
         await _db_Rentals.InsertRental(rental);
 
