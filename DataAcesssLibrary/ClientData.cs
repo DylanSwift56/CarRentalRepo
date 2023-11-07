@@ -52,6 +52,17 @@ namespace DataAccessLibrary
 
             return results.First();
         }
+
+        public async Task<ClientModel> GetClientByID(int clientID)
+        {
+            string sql = "SELECT * FROM dbo.Clients WHERE Client_id = @Client_id";
+
+            var parameters = new { Client_id = clientID };
+
+            var results = await _db.LoadData<ClientModel, dynamic>(sql, parameters);
+
+            return results.First();
+        }
     }
     }
 
