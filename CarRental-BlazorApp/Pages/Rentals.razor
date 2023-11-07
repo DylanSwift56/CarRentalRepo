@@ -26,26 +26,7 @@
 
             <label for="EndDate">End Date: </label>
             <InputDate id="EndDate" @bind-Value="newRental.EndDate" min=@DateTime.Now.Date></InputDate>
-
-            <label for="Client_ID">Client ID: </label>
-            <InputSelect id="Client_ID" @bind-Value="newRental.Client_ID" class="m-1">
-                @if (clients is null)
-                {
-                    <option value="-1">-1</option>
-                }
-                else
-                {
-
-                    <option value="">Select</option>
-
-                    @foreach (var client in clients)
-                    {
-
-                        <option value="@client.Client_id">@client.Client_id - @client.Name</option>
-                    }
-                }
-            </InputSelect>
-
+            <br />
             <label for="Car_Type">Car Type: </label>
             <InputSelect id="Car_Type" @bind-Value="selectedCarType" class="m-1">
                 @if (carTypes is null)
@@ -130,7 +111,7 @@
 
 
 
- @code {
+@code {
     private List<RentalModel> rentals;
     private List<ClientModel> clients;
     private List<CarModel> cars;
@@ -157,7 +138,8 @@
 
     private async Task InsertRental()
     {
-        client = await session.GetItemAsync<ClientModel>("SessionUser");
+        int clientID = await session.GetItemAsync<int>("SessionUser");
+        client = await _db_Clients.GetClientByID(clientID);
 
         RentalModel rental = new RentalModel
                 {
