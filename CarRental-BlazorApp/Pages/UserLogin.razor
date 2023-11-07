@@ -46,7 +46,7 @@
         {
             int userID = await _db_Clients.GetClientIdByEmail(loginModel.Username);
             await session.SetItemAsync("SessionUser", userID);
-            Navigation.NavigateTo("/admin/rentals");
+            Navigation.NavigateTo("/rent");
         }
         else
         {
