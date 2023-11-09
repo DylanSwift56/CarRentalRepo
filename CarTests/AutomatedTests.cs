@@ -18,27 +18,36 @@ namespace CarTests
 
         [Test]
         public void NavigateToAdminLoginCheckURL() {
-            driver.Navigate().GoToUrl("https://localhost:7100/admin/login");
+            driver.Navigate().GoToUrl("https://car-rental-new.azurewebsites.net/admin/login");
 
-            Assert.AreEqual("https://localhost:7100/admin/login", driver.Url);
+            Assert.AreEqual("https://car-rental-new.azurewebsites.net/admin/login", driver.Url);
         }
 
         [Test]
         public void NavigateToRentalsCheckURL()
         {
-            driver.Navigate().GoToUrl("https://localhost:7100/rent");
+            driver.Navigate().GoToUrl("https://car-rental-new.azurewebsites.net/rent");
 
-            Assert.AreEqual("https://localhost:7100/rent", driver.Url);
+            Assert.AreEqual("https://car-rental-new.azurewebsites.net/rent", driver.Url);
         }
 
         [Test]
         public void TestIncorrectLoginDetailsEntered()
         {
-            driver.Navigate().GoToUrl("https://localhost:7100/login");
+            driver.Navigate().GoToUrl("https://car-rental-new.azurewebsites.net/login");
+
+            Thread.Sleep(2000);
+
             //Types random into email
             driver.FindElement(By.Id("email")).SendKeys("Random");
+
+            Thread.Sleep(2000);
+
             //Type random into password
             driver.FindElement(By.Id("password")).SendKeys("Random");
+
+            Thread.Sleep(2000);
+
             //Clicks submit button
             driver.FindElement(By.Id("submit")).Click();
 
