@@ -280,7 +280,8 @@
                 Model = newCar.Model,
                 NumberOfPassengers = newCar.NumberOfPassengers,
                 CostPerDay = newCar.CostPerDay,
-                CarType = newCar.CarType
+                CarType = newCar.CarType,
+                Status = 'A'
             };
         await _db_cars.InsertCar(car);
 
