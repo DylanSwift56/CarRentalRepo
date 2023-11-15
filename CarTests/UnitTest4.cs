@@ -19,7 +19,7 @@ namespace CarTests
         {
             DisplayClientModel clientModel = new DisplayClientModel();
             clientModel.Name = "John";
-            Assert.True(clientModel.Name.Equals("Name"));
+            Assert.True(clientModel.Name.Equals("John"));
         }
         [Test]
         public void setPhone()
@@ -47,7 +47,7 @@ namespace CarTests
         {
             DisplayClientModel clientModel = new DisplayClientModel();
             clientModel.Company = "Micro";
-            Assert.True(clientModel.Company.Equals("123"));
+            Assert.True(clientModel.Company.Equals("Micro"));
         }
         [Test]
         public void setLicenceType()
